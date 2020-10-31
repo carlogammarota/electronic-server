@@ -130,6 +130,17 @@ var ws = require('express-ws')(app);
         });
 
 
+        app.get('/', (req, res) => {
+            // console.log('Users:', users)
+            // res.sendFile(__dirname + '/index.html');
+            // socket.emit("server-handshake", "asd"); 
+            // socket.emit("server-handshake", "My string", 42, { myMember : "My member string" });
+            // socket.emit("otherScript");
+            res.send('Servidor Funcionando')
+            
+        })
+
+
 
         socket.on('disconnect', () => {
             for (let index = 0; index < clients.length; index++) {
