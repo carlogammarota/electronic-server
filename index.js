@@ -5,10 +5,10 @@ var io = require('socket.io')(http, {
     // serveClient: false,
     // below are engine.IO options
     // pingInterval: 10000,
-    pingInterval: 10000,
-    pingTimeout: 20000,
+    pingInterval: 30,
+    pingTimeout: 60000,
     cookie: false,
-    transports: [ 'polling','websocket'],
+    transports: ['websocket'],
     wsEngine: ws
   });
 var ws = require('express-ws')(app);
@@ -53,7 +53,22 @@ var ws = require('express-ws')(app);
     let users = 0;
     let clients = []
     // io(http, {pingTimeout: 60000})
+
+
     io.on('connection', (socket) => {
+
+
+
+        app.get('/llamada', (req, res) => {
+            // console.log('Users:', users)
+            // res.sendFile(__dirname + '/index.html');
+            // socket.emit("server-handshake", "asd"); 
+            // socket.emit("server-handshake", "My string", 42, { myMember : "My member string" });
+            // socket.emit("otherScript");
+           
+            res.send('llamada')
+            
+        });
 
         users++
         console.log('a user connected', users);
@@ -66,23 +81,21 @@ var ws = require('express-ws')(app);
             _id: socket.id,
         })
         
-
+        // getIdCliente
+        io.to(socket.id).emit('clientsOnline', clients, users);
         socket.broadcast.emit('agregarJugador', socket.id)
+        // socket.
+        
         
 
-        app.get('/llamada', (req, res) => {
-            // console.log('Users:', users)
-            // res.sendFile(__dirname + '/index.html');
-            // socket.emit("server-handshake", "asd"); 
-            // socket.emit("server-handshake", "My string", 42, { myMember : "My member string" });
-            socket.emit("otherScript");
-            res.send('llamada')
-            
-        })
+        
+        
+
+      
 
         socket.on("MOVE", (x, z) => {
             // console.log('ID', socket.id);
-            // console.log('MOVE', x, z);
+            
 
 
             for (let index = 0; index < clients.length; index++) {
@@ -91,10 +104,13 @@ var ws = require('express-ws')(app);
                     clients[index].z = z;
                     console.log(clients)
                 }
+
+                console.log('CLIENTS', clients);
             }
 
-            socket.broadcast.emit('move-client', socket.id, x, z);
             // socket.broadcast.emit('move-client', socket.id, x, z);
+            socket.broadcast.emit('move-client', socket.id, x, z);
+            // socket.emit('move-client', socket.id, x, z);
 
         });
         socket.on("test-event", () => {
@@ -151,6 +167,7 @@ var ws = require('express-ws')(app);
             socket.emit('disconnectClient', socket.id);
             users--
             console.log('user disconnected');
+            console.log('Users Online', users);
         });
 
            
