@@ -64,7 +64,7 @@ var ws = require('express-ws')(app);
             // res.sendFile(__dirname + '/index.html');
             // socket.emit("server-handshake", "asd"); 
             // socket.emit("server-handshake", "My string", 42, { myMember : "My member string" });
-            // socket.emit("otherScript");
+            socket.emit("clientsOnline");
            
             res.send('llamada')
             
@@ -82,7 +82,7 @@ var ws = require('express-ws')(app);
         })
         
         // getIdCliente
-        io.to(socket.id).emit('clientsOnline', clients, users);
+        io.to(socket.id).emit('clientsOnline', clients, clients.length);
         socket.broadcast.emit('agregarJugador', socket.id)
         // socket.
         
@@ -113,10 +113,26 @@ var ws = require('express-ws')(app);
             // socket.emit('move-client', socket.id, x, z);
 
         });
-        socket.on("test-event", () => {
-            console.log('some=event')
+        socket.on("test-event", (directionX, directionZ, speed, positionX, positionZ, angle) => {
+            console.log('some=event', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
+            socket.broadcast.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
             // console.log(arg0); //output: "optional event data"
             // acknowledge("optional acknowledgement data");
+            for (let index = 0; index < clients.length; index++) {
+                if(clients[index]._id == socket.id){
+                    clients[index].directionX = directionX;
+                    clients[index].directionZ = directionZ;
+                    clients[index].speed = speed;
+                    clients[index].positionX = positionX;
+                    clients[index].positionZ = positionZ;
+                    clients[index].angle = angle;
+                    // console.log(clients)
+                }
+
+                console.log('CLIENTS', clients);
+                
+            }
+
         });
 
         socket.on("client-position", (x, z) => {
@@ -164,9 +180,9 @@ var ws = require('express-ws')(app);
                     clients.shift(clients[index]);
                 }
             }
-            socket.emit('disconnectClient', socket.id);
+            socket.broadcast.emit('disconnectClient', socket.id);
             users--
-            console.log('user disconnected');
+            console.log('user disconnected', socket.id);
             console.log('Users Online', users);
         });
 
