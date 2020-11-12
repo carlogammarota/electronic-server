@@ -84,6 +84,7 @@ var ws = require('express-ws')(app);
         // getIdCliente
         io.to(socket.id).emit('clientsOnline', clients, clients.length);
         socket.broadcast.emit('agregarJugador', socket.id)
+        socket.emit('usersOnline', clients.length)
         // socket.
         
         
@@ -113,26 +114,66 @@ var ws = require('express-ws')(app);
             // socket.emit('move-client', socket.id, x, z);
 
         });
-        socket.on("test-event", (directionX, directionZ, speed, positionX, positionZ, angle) => {
+        socket.on("position", (directionX, directionZ, speed, positionX, positionZ, angle) => {
             console.log('some=event', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
             socket.broadcast.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
             // console.log(arg0); //output: "optional event data"
             // acknowledge("optional acknowledgement data");
-            for (let index = 0; index < clients.length; index++) {
-                if(clients[index]._id == socket.id){
-                    clients[index].directionX = directionX;
-                    clients[index].directionZ = directionZ;
-                    clients[index].speed = speed;
-                    clients[index].positionX = positionX;
-                    clients[index].positionZ = positionZ;
-                    clients[index].angle = angle;
-                    // console.log(clients)
-                }
 
-                console.log('CLIENTS', clients);
+            // for (let index = 0; index < clients.length; index++) {
+            //     if(clients[index]._id == socket.id){
+            //         clients[index].directionX = directionX;
+            //         clients[index].directionZ = directionZ;
+            //         clients[index].speed = speed;
+            //         clients[index].positionX = positionX;
+            //         clients[index].positionZ = positionZ;
+            //         clients[index].angle = angle;
+            //         // console.log(clients)
+            //     }
+
+            //     console.log('CLIENTS', clients);
                 
-            }
+            // }
 
+            getPositionArrayById(socket.id).then((succes)=>{
+                
+                clients[succes].directionX = directionX;
+                clients[succes].directionZ = directionZ;
+                clients[succes].speed = speed;
+                clients[succes].positionX = positionX;
+                clients[succes].positionZ = positionZ;
+                clients[succes].angle = angle;
+
+                console.log('succes', succes);
+                console.log('CLIENTS', clients);
+
+            }).catch((err)=>{
+                console.log('position: no se encontro con ese id')
+            });
+
+        });
+
+
+        function getPositionArrayById(id){
+          return new Promise((resolve, reject)=>{
+              for (let index = 0; index < clients.length; index++) {
+                if (clients[index]._id == id) {
+                  resolve(index);
+                }
+              }
+              reject();
+          })
+        }
+
+        // Setea el nombre que viene desde el Cliente
+        socket.on('set_name', (name) => {
+            getPositionArrayById(socket.id).then((succes)=>{
+                clients[succes].name = name;
+                console.log('succes', succes);
+                console.log('set_name: El nombre se agrego con exito!');
+            }).catch((err)=>{
+              console.log('set_name: no se encontro con ese id')
+            });
         });
 
         socket.on("client-position", (x, z) => {
@@ -180,10 +221,14 @@ var ws = require('express-ws')(app);
                     clients.shift(clients[index]);
                 }
             }
-            socket.broadcast.emit('disconnectClient', socket.id);
+            socket.broadcast.emit('disconnectClient', socket.id, clients.length );
             users--
             console.log('user disconnected', socket.id);
             console.log('Users Online', users);
+            // socket.emit('usersOnline', clients.length)
+        });
+        socket.on('getUsers', () => {
+            socket.emit('Users', clients.length)
         });
 
            
