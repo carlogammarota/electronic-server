@@ -170,7 +170,8 @@ var ws = require('express-ws')(app);
             getPositionArrayById(socket.id).then((succes)=>{
                 clients[succes].name = name;
                 console.log('succes', succes);
-                console.log('set_name: El nombre se agrego con exito!');
+                console.log('set_name: El nombre' + 'se agrego con exito!');
+                console.log('CLIENT', clients[succes]);
             }).catch((err)=>{
               console.log('set_name: no se encontro con ese id')
             });
