@@ -82,7 +82,7 @@ var ws = require('express-ws')(app);
         })
         
         // getIdCliente
-        io.to(socket.id).emit('clientsOnline', clients, clients.length);
+        io.to(socket.id).emit('clientsOnline', clients, clients.length, socket.id);
         socket.broadcast.emit('agregarJugador', socket.id)
         socket.emit('usersOnline', clients.length)
         // socket.
@@ -110,7 +110,7 @@ var ws = require('express-ws')(app);
             }
 
             // socket.broadcast.emit('move-client', socket.id, x, z);
-            socket.broadcast.emit('move-client', socket.id, x, z);
+            socket.broadcast.emit('move-client', socket.id, x,   z);
             // socket.emit('move-client', socket.id, x, z);
 
         });
@@ -135,7 +135,7 @@ var ws = require('express-ws')(app);
                 
             // }
 
-            getPositionArrayById(socket.id).then((succes)=>{
+        getPositionArrayById(socket.id).then((succes)=>{
                 
                 clients[succes].directionX = directionX;
                 clients[succes].directionZ = directionZ;
@@ -170,7 +170,7 @@ var ws = require('express-ws')(app);
             getPositionArrayById(socket.id).then((succes)=>{
                 clients[succes].name = name;
                 console.log('succes', succes);
-                console.log('set_name: El nombre' + 'se agrego con exito!');
+                console.log('set_name: El nombre' + name + 'se agrego con exito!');
                 console.log('CLIENT', clients[succes]);
             }).catch((err)=>{
               console.log('set_name: no se encontro con ese id')
