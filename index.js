@@ -215,6 +215,7 @@ var ws = require('express-ws')(app);
                     clients.shift(clients[index]);
                 }
             }
+            console.log('DISCONECT')
             socket.broadcast.emit('disconnectClient', socket.id, clients.length );
             users--
             console.log('user disconnected', socket.id);
