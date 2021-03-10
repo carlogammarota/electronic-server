@@ -64,7 +64,7 @@ var ws = require('express-ws')(app);
             // res.sendFile(__dirname + '/index.html');
             // socket.emit("server-handshake", "asd"); 
             // socket.emit("server-handshake", "My string", 42, { myMember : "My member string" });
-            socket.emit("clientsOnline");
+            // socket.emit("clientsOnline");
            
             res.send('llamada')
             
@@ -82,9 +82,16 @@ var ws = require('express-ws')(app);
         })
         
         // getIdCliente
+
+        //ARREGLAR ESTO
+        // console.log('Clientes conectados', clients.length)
+        // io.to(socket.id).emit('clientsOnline', clients, clients.length - 1, socket.id);
+        console.log(socket.id)
         io.to(socket.id).emit('clientsOnline', clients, clients.length, socket.id);
+        io.to(socket.id).emit('getIdCliente', socket.id);
+
         socket.broadcast.emit('agregarJugador', socket.id)
-        socket.emit('usersOnline', clients.length)
+        // socket.emit('usersOnline', clients.length)
         // socket.
         
         
@@ -94,28 +101,29 @@ var ws = require('express-ws')(app);
 
       
 
-        socket.on("MOVE", (x, z) => {
-            // console.log('ID', socket.id);
+        // socket.on("MOVE", (x, z) => {
+        //     // console.log('ID', socket.id);
             
 
 
-            for (let index = 0; index < clients.length; index++) {
-                if(clients[index]._id == socket.id){
-                    clients[index].x = x;
-                    clients[index].z = z;
-                    console.log(clients)
-                }
+        //     for (let index = 0; index < clients.length; index++) {
+        //         if(clients[index]._id == socket.id){
+        //             clients[index].x = x;
+        //             clients[index].z = z;
+        //             console.log(clients)
+        //         }
 
-                console.log('CLIENTS', clients);
-            }
+        //         console.log('CLIENTS', clients);
+        //     }
 
-            // socket.broadcast.emit('move-client', socket.id, x, z);
-            socket.broadcast.emit('move-client', socket.id, x,   z);
-            // socket.emit('move-client', socket.id, x, z);
+        // //     // socket.broadcast.emit('move-client', socket.id, x, z);
+        // //     socket.broadcast.emit('move-client', socket.id, x,   z);
+        // //     // socket.emit('move-client', socket.id, x, z);
 
-        });
+        // });
         socket.on("position", (directionX, directionZ, speed, positionX, positionZ, angle) => {
             console.log('some=event', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
+            // socket.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
             socket.broadcast.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
             // console.log(arg0); //output: "optional event data"
             // acknowledge("optional acknowledgement data");
@@ -144,8 +152,8 @@ var ws = require('express-ws')(app);
                 clients[succes].positionZ = positionZ;
                 clients[succes].angle = angle;
 
-                console.log('succes', succes);
-                console.log('CLIENTS', clients);
+                // console.log('succes', succes);
+                // console.log('CLIENTS', clients);
 
             }).catch((err)=>{
                 console.log('position: no se encontro con ese id')
@@ -169,38 +177,19 @@ var ws = require('express-ws')(app);
         socket.on('set_name', (name) => {
             getPositionArrayById(socket.id).then((succes)=>{
                 clients[succes].name = name;
-                console.log('succes', succes);
-                console.log('set_name: El nombre' + name + 'se agrego con exito!');
-                console.log('CLIENT', clients[succes]);
+                // console.log('succes', succes);
+                // console.log('set_name: El nombre' + name + 'se agrego con exito!');
+                // console.log('CLIENT', clients[succes]);
             }).catch((err)=>{
               console.log('set_name: no se encontro con ese id')
             });
         });
 
-        socket.on("client-position", (x, z) => {
-            // console.log('socket', socket)
-            // console.log("x", x);
-            // console.log("z", z);
-
-            clients.push({
-                _id: socket.id,
-                position: [x, z]
-            })
-    
-            // console.log('clients', clients)
-
-            // socket.broadcast.emit('broadcast', x, z);
-
-          
-            
-            // socket.emit("server-handshake");
-            // console.log("Sent server handshake");
-        });
     
         app.ws('/', (s, req) => {
             console.error('websocket connection');
             for (var t = 0; t < 3; t++)
-              setTimeout(() => s.send('message from server', ()=>{}), 1000*t);
+              setTimeout(() => s.send('message from server', ()=>{}), 100*t);
         });
 
 
