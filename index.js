@@ -50,7 +50,7 @@ var ws = require('express-ws')(app);
 
 
 
-    let users = 0;
+    // let users = 0;
     let clients = []
     // io(http, {pingTimeout: 60000})
 
@@ -70,8 +70,8 @@ var ws = require('express-ws')(app);
             
         });
 
-        users++
-        console.log('a user connected', users);
+        // users++
+        // console.log('a user connected', users);
 
         // _id = socket.id
         // setInterval(() => {
@@ -95,8 +95,9 @@ var ws = require('express-ws')(app);
         socket.broadcast.emit('agregarJugador', socket.id)
         // socket.emit('usersOnline', clients.length)
         // socket.
-        
-        
+        console.log('CONNECT')
+        console.log('Users Online', clients.length);
+
         socket.on('ping', function() {
             socket.emit('pong');
         });
@@ -125,10 +126,10 @@ var ws = require('express-ws')(app);
         // //     // socket.emit('move-client', socket.id, x, z);
 
         // });
-        socket.on("position", (directionX, directionZ, speed, positionX, positionZ, angle) => {
-            console.log('some=event', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
+        socket.on("position", (directionX, directionZ, speed, positionX, positionZ, angle, positionY) => {
+            console.log('some=event', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle, positionY);
             // socket.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
-            socket.broadcast.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle);
+            socket.broadcast.emit('move-client', socket.id ,directionX, directionZ, speed, positionX, positionZ, angle, positionY);
             // console.log(arg0); //output: "optional event data"
             // acknowledge("optional acknowledgement data");
 
@@ -143,7 +144,9 @@ var ws = require('express-ws')(app);
             //         // console.log(clients)
             //     }
 
-            //     console.log('CLIENTS', clients);
+                // console.log('CLIENTS', clients);
+
+                // getPositionArrayById()
                 
             // }
 
@@ -157,7 +160,7 @@ var ws = require('express-ws')(app);
                 clients[succes].angle = angle;
 
                 // console.log('succes', succes);
-                // console.log('CLIENTS', clients);
+                console.log('CLIENTS', clients[succes]);
 
             }).catch((err)=>{
                 console.log('position: no se encontro con ese id')
@@ -216,10 +219,11 @@ var ws = require('express-ws')(app);
                 }
             }
             console.log('DISCONECT')
+            // users--;
             socket.broadcast.emit('disconnectClient', socket.id, clients.length );
-            users--
+            
             console.log('user disconnected', socket.id);
-            console.log('Users Online', users);
+            console.log('Users Online', clients.length);
             // socket.emit('usersOnline', clients.length)
         });
         socket.on('getUsers', () => {
