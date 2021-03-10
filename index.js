@@ -88,6 +88,8 @@ var ws = require('express-ws')(app);
         // io.to(socket.id).emit('clientsOnline', clients, clients.length - 1, socket.id);
         console.log(socket.id)
         io.to(socket.id).emit('clientsOnline', clients, clients.length, socket.id);
+
+        //Manda el user id al Cliente
         io.to(socket.id).emit('getIdCliente', socket.id);
 
         socket.broadcast.emit('agregarJugador', socket.id)
@@ -95,7 +97,9 @@ var ws = require('express-ws')(app);
         // socket.
         
         
-
+        socket.on('ping', function() {
+            socket.emit('pong');
+        });
         
         
 
