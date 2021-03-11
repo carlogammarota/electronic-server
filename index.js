@@ -121,7 +121,8 @@ var ws = require('express-ws')(app);
         socket.conn.on('packetCreate', packet => {
             if (packet.type === 'pong') {
                 console.log("ping", ping - new Date())
-                console.log(`Sending pong to client.`, packet);
+                socket.emit('ping', ping - new Date())
+                // console.log(`Sending pong to client.`, packet);
             }
         });
 
