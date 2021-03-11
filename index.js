@@ -109,22 +109,25 @@ var ws = require('express-ws')(app);
         //     // socket.emit('pong');
         // });
         // console.log(socket.conn.pingTimeoutTimer.Timeout)
-
-        var ping = new Date();
-        socket.conn.on('packet', packet => {
-            if (packet.type === 'ping') {
-                ping = new Date()
-                console.log(`Received ping from client}`, packet);
-            }
-        });
+        // console.log(Math.floor(Date.now() / 1000))
+        // var date = Math.floor(Date.now() / 1000);
+        var date = Date.now();
         // var realPing = new Date();
         socket.conn.on('packetCreate', packet => {
             if (packet.type === 'pong') {
-                console.log("ping", ping - new Date())
-                socket.emit('ping', ping - new Date())
+                io.to(socket.id).emit('ping', date)
                 // console.log(`Sending pong to client.`, packet);
             }
         });
+        socket.conn.on('packet', packet => {
+            if (packet.type === 'ping') {
+                
+                console.log("ping", Date.now() - date )
+                date = Date.now()
+                // console.log(`Received ping from client}`, date);
+            }
+        });
+
 
         // socket.on('connect', function() {
         //     console.log("Client is Connected");
