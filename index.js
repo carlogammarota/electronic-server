@@ -98,9 +98,40 @@ var ws = require('express-ws')(app);
         console.log('CONNECT')
         console.log('Users Online', clients.length);
 
-        socket.on('ping', function() {
-            socket.emit('pong');
+        // socket.on('ping', function() {
+        //     socket.emit('pong');
+        // });
+
+        
+        // socket.on('ping', (data) => {
+        //     console.log('ping', socket.ping)
+        //     // data.time
+        //     // socket.emit('pong');
+        // });
+        // console.log(socket.conn.pingTimeoutTimer.Timeout)
+
+        var ping = new Date();
+        socket.conn.on('packet', packet => {
+            if (packet.type === 'ping') {
+                ping = new Date()
+                console.log(`Received ping from client}`, packet);
+            }
         });
+        // var realPing = new Date();
+        socket.conn.on('packetCreate', packet => {
+            if (packet.type === 'pong') {
+                console.log("ping", ping - new Date())
+                console.log(`Sending pong to client.`, packet);
+            }
+        });
+
+        // socket.on('connect', function() {
+        //     console.log("Client is Connected");
+        //   });
+          
+        //   socket.on('ping', function(data) {
+        //     console.log('Received Pong: ', data);
+        //   });
         
         
 
@@ -179,6 +210,7 @@ var ws = require('express-ws')(app);
               reject();
           })
         }
+
 
         // Setea el nombre que viene desde el Cliente
         socket.on('set_name', (name) => {
